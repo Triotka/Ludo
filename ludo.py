@@ -12,24 +12,26 @@ class Pawn(): #TODO
 class Game:
     def __init__(self):
         self.sizeBoard = 17
-        self.board = [[0] for i in range(self.sizeBoard)]
+        self.board = [[0] * self.sizeBoard for _ in range(self.sizeBoard)]
         self.turn = 1
         self.numberOfPlayers = 1
+        self.sizeofYard = 7
         pass
    #sets yard on the board
     def setYards(self):
+        
 
          #set a yard of size 7x7 filled with color of a player on certain position 
         def setYard(startUpRow, startLeftColumn, filling):
-            sizeofYard = 7
+            
 
-            assert sizeofYard + startLeftColumn < self.sizeBoard and sizeofYard + startUpRow < self.sizeBoard, 'Yard is out of board'
-            for i in range(sizeofYard):
+            assert self.sizeofYard + startLeftColumn <= self.sizeBoard and self.sizeofYard + startUpRow <= self.sizeBoard, 'Yard is out of board'
+            for i in range(self.sizeofYard):
                 
                 self.board[startUpRow][startLeftColumn + i] = filling #up boundary
-                self.board[startUpRow + sizeofYard - 1][startLeftColumn + i] = filling  #down boundary
+                self.board[startUpRow + self.sizeofYard-1][startLeftColumn + i] = filling  #down boundary
                 self.board[startUpRow + i][startLeftColumn] = filling    #left boundary
-                self.board[startUpRow + i][startLeftColumn + sizeofYard - 1] = filling    #rightboundary
+                self.board[startUpRow + i][startLeftColumn + self.sizeofYard - 1] = filling    #rightboundary
             
             # colors places for pawns
             self.board[startUpRow + 2][startLeftColumn + 2] = filling
@@ -38,7 +40,12 @@ class Game:
             self.board[startUpRow + 4][startLeftColumn + 4] = filling
 
     #set yard of players
-
+        setYard(0, 0, 1)
+        setYard(0, self.sizeBoard - self.sizeofYard, 2)
+        setYard(self.sizeBoard - self.sizeofYard, self.sizeBoard - self.sizeofYard, 3)
+        setYard(self.sizeBoard - self.sizeofYard, 0, 4)
+        
+    
     def setNumberOfPlayers(self):
         pass
 
@@ -84,5 +91,15 @@ class Game:
 
 
 game = Game()
-while(True):
-    game.rollingDice()
+# while(True):
+#     game.rollingDice()
+game.setYards()
+
+def printingBoard():
+    for i in range(game.sizeBoard):
+        s =''
+        for j in range(game.sizeBoard):
+            s += str(game.board[i][j]) + ' '
+        print(s)
+
+printingBoard()
