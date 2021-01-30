@@ -7,25 +7,25 @@ import random
 
     
 class Pawn(): #TODO
-    def __init__(self, positionRow, positionColumn, color, name):
+    def __init__(self, positionRow, positionColumn, player, name):
         
         self.positionColumn = positionColumn #column in which it is on the board
         self.positionRow = positionRow  #row in which it is on the board   
-        self.color = color
+        self.player = player
         self.name = name    #name visible on the board
         self.directionColumn = 0    #direction for next move for the column
         self.directionRow = 0   #direction for next move for the row
 
      #moving the pawn by number of moves on the board   
-    def move(self, numberOfMoves, board): #TODO
+    def move(self, numberOfMoves, locationOfPawns):
         
         #moves pawn one grid in proper direction and returns a board with this change
         def go():
-             board.board[self.positionRow][self.positionColumn] = 0
+             locationOfPawns.board[self.positionRow][self.positionColumn] = 0
              self.positionColumn += self.directionColumn
              self.positionRow += self.directionRow
-             board.board[self.positionRow][self.positionColumn] = self.name
-             return board
+             locationOfPawns.board[self.positionRow][self.positionColumn] = self.name
+             return locationOfPawns
              
         #turning a pawn down
         def turnDown():
@@ -52,39 +52,39 @@ class Pawn(): #TODO
 
             
             if self.positionRow == 0:   # border on the top
-                if self.positionColumn == board.sizeOfYard: #left one
+                if self.positionColumn == locationOfPawns.sizeOfYard: #left one
                     turnRight()           
-                elif self.positionColumn == board.sizeOfYard + 2: #right one
+                elif self.positionColumn == locationOfPawns.sizeOfYard + 2: #right one
                     turnDown()
-            elif self.positionRow == board.sizeBoard - 1:   # border on the bottom
-                if self.positionColumn == board.sizeOfYard: #left one
+            elif self.positionRow == locationOfPawns.sizeBoard - 1:   # border on the bottom
+                if self.positionColumn == locationOfPawns.sizeOfYard: #left one
                     turnUp()           
-                elif self.positionColumn == board.sizeOfYard + 2:   #right one
+                elif self.positionColumn == locationOfPawns.sizeOfYard + 2:   #right one
                     turnLeft()
 
 
             if self.positionColumn == 0:   #border on the left
-                if self.positionRow == board.sizeOfYard:    #top one
+                if self.positionRow == locationOfPawns.sizeOfYard:    #top one
                     turnRight()
-                elif self.positionRow == board.sizeOfYard + 2:  #bottom one
+                elif self.positionRow == locationOfPawns.sizeOfYard + 2:  #bottom one
                     turnUp()
             
-            elif self.positionColumn == board.sizeBoard - 1:  #border on the right
-                if self.positionRow == board.sizeOfYard:    #top one
+            elif self.positionColumn == locationOfPawns.sizeBoard - 1:  #border on the right
+                if self.positionRow == locationOfPawns.sizeOfYard:    #top one
                     turnDown()
-                elif self.positionRow == board.sizeOfYard + 2:  #bottom one
+                elif self.positionRow == locationOfPawns.sizeOfYard + 2:  #bottom one
                     turnLeft()
 
             #middle
-            elif self.positionColumn == board.sizeOfYard:
-                if self.positionRow == board.sizeOfYard:    #top one
+            elif self.positionColumn == locationOfPawns.sizeOfYard:
+                if self.positionRow == locationOfPawns.sizeOfYard:    #top one
                     turnUp()
-                elif self.positionRow == board.sizeOfYard + 2:  #bottom one
+                elif self.positionRow == locationOfPawns.sizeOfYard + 2:  #bottom one
                     turnLeft()
-            elif self.positionColumn == board.sizeOfYard + 2:
-                if self.positionRow == board.sizeOfYard:    #top one
+            elif self.positionColumn == locationOfPawns.sizeOfYard + 2:
+                if self.positionRow == locationOfPawns.sizeOfYard:    #top one
                     turnRight()
-                elif self.positionRow == board.sizeOfYard + 2:  #bottom one
+                elif self.positionRow == locationOfPawns.sizeOfYard + 2:  #bottom one
                     turnDown()
             
 
@@ -92,18 +92,74 @@ class Pawn(): #TODO
            turning()
            go()
 
+    #setting pawn on the start place
+    def setOnStart(self, locationOfPawns):
+        locationOfPawns.board[self.positionRow][self.positionColumn] = 0
 
+        if self.player == 1:
+            self.positionRow = locationOfPawns.sizeOfYard
+            self.positionColumn = 0
+        
+        if self.player == 2:
+            self.positionRow = 0
+            self.positionColumn = locationOfPawns.sizeOfYard + 2
+        
+        if self.player == 3:
+            self.positionRow = locationOfPawns.sizeOfYard + 2
+            self.positionColumn = locationOfPawns.sizeBoard - 1
+
+        if self.player == 4: 
+            self.positionRow = locationOfPawns.sizeBoard - 1
+            self.positionColumn = locationOfPawns.sizeOfYard
+            
+        locationOfPawns.board[self.positionRow][self.positionColumn] = self.name
+        return locationOfPawns
            
 
 
-    def remove(self): #TODO
-         pass  
+    def returnToYard(self, locationOfPawns): #TODO
+        locationOfPawns.board[self.positionRow][self.positionColumn] = 0
+        
+        if self.player == 1:
+            # coordinate of place for pawn top left
+            placeForPawnRow = 0 + 2
+            placeForPawnColumn = 0 + 2
 
+        if self.player == 2:
+            # coordinate of place for pawn top left
+            placeForPawnRow = 0 + 2
+            placeForPawnColumn = locationOfPawns.sizeBoard - locationOfPawns.sizeOfYard + 2
+
+        if self.player == 3:
+            # coordinate of place for pawn top left
+            placeForPawnRow = locationOfPawns.sizeBoard - locationOfPawns.sizeOfYard + 2
+            placeForPawnColumn = locationOfPawns.sizeBoard - locationOfPawns.sizeOfYard + 2
+
+        if self.player == 4:
+            # coordinate of place for pawn top left
+            placeForPawnRow = locationOfPawns.sizeBoard - locationOfPawns.sizeOfYard + 2
+            placeForPawnColumn = 0 + 2
+     
+        for i in range (0, 3, 2):
+            for j in range(0, 3, 2):
+                if locationOfPawns.board[placeForPawnRow + i][placeForPawnColumn + j] == 0:
+                    
+                    self.positionRow = placeForPawnRow + i
+                    self.positionColumn = placeForPawnColumn + j
+                    locationOfPawns.board[self.positionRow][self.positionColumn] = self.name
+            
+                    break
+            else:
+                continue
+            break
+
+
+        return locationOfPawns
 
 class Board:
     def __init__(self):
         self.sizeBoard = 17
-        self.board = [['-'] * self.sizeBoard for _ in range(self.sizeBoard)]
+        self.board = [[0] * self.sizeBoard for _ in range(self.sizeBoard)]
         self.sizeOfYard = 7
         self.sizeOfHouse = 5
     
@@ -156,11 +212,18 @@ class Board:
 
     #sets starts on the board
     def setStarts(self):    #TODO
-        pass
+        
+        self.board[self.sizeOfYard][0] = 1  #setting starting grid for player 1
+        self.board[0][self.sizeOfYard + 2] = 2  #setting starting grid for player 2
+        self.board[self.sizeOfYard + 2][self.sizeBoard - 1] = 3  #setting starting grid for player 3
+        self.board[self.sizeBoard - 1][self.sizeOfYard] = 4  #setting starting grid for player 4
+
+            
     #creates a board with yards and houses
     def createBoard(self):
         self.setHouses()
         self.setYards()
+        self.setStarts()
 
     def printingBoard(self):    #TODO
         for i in range(self.sizeBoard):
@@ -253,12 +316,23 @@ class Game:
 #     game.rollingDice()
 
 test = Board()
-test.createBoard()
 
-p = Pawn(0, 7, 'green', 'G' + '1')
-for i in range(20):
-    p.move(5, test)
-    test.printingBoard()
+p = Pawn(0, 7, 1, 'G' + '1')
+f = Pawn(2, 0, 1, 'G' + 'F')
+q = Pawn(2, 8, 1, 'G' + 'q')
+w = Pawn(2, 7, 1, 'G' + 'w')
+f.returnToYard(test)
+p.returnToYard(test)
+q.returnToYard(test)
+w.returnToYard(test)
+test.printingBoard()
+test.createBoard()
+test.printingBoard()
+
+
+# for i in range(20):
+#     p.move(5, test)
+#     test.printingBoard()
 
 
 
