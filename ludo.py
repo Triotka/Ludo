@@ -1,12 +1,5 @@
 import random
-
-
-
-
-
-
-
-    
+   
 class Pawn(): #TODO
     def __init__(self, positionRow, positionColumn, player, name):
         
@@ -315,34 +308,39 @@ class Player:
                 locationOfPawns.board[yardRow + i][yardColumn + j] = pawn #putting it on the board with pawns
     
     def isWinner(self):
+        
         for pawn in self.pawns:
             if pawn.gridInHouse == 0:
                 return False
+        len(self.pawns)
         return True
-
-    #decisions made if a player is a bot 
-    def actingBot(self): #TODO
-        assert self.bot == True, 'player is not a bot'
 
 
     
 class Game:
     def __init__(self):
         self.boardPawns = Board()
-        self.turn = 4
+        self.turn = 1
         self.numberOfPlayers = 1
         self.players = []
+        self.rolledNumber = -1
+        self.numberOfBots = 0
         
     #creates players for the game
     def settingPlayers(self):
-        self.players.append(Player(1, 'G', True))
-        self.players.append(Player(2, 'R', True))
-        self.players.append(Player(3, 'B', True))
-        self.players.append(Player(4, 'Y', True))
+        self.players.append(Player(1, 'G', False))
+        self.players.append(Player(2, 'R', False))
+        self.players.append(Player(3, 'B', False))
+        self.players.append(Player(4, 'Y', False))
+
+    def settingBots(self):
+        for i in range(self.numberOfBots):
+            self.players[i].bot = True
 
 
     def settingPawns(self, locationOfPawns):
         self.settingPlayers()
+        self.settingBots()
 
         for i in range(4):
             assert isinstance(self.players[i], Player), 'it is not a player'
@@ -353,15 +351,22 @@ class Game:
         self.players[3].setPawns(locationOfPawns.sizeBoard - locationOfPawns.sizeOfYard + 2, 0 + 2, locationOfPawns)
                       
     def setNumberOfPlayers(self):
-        print('type number of players from 2 to 4 (others are going to be bots)')
+        print('type number of players from 2 to 4')
         self.numberOfPlayers = int(input())
         while self.numberOfPlayers < 2 or self.numberOfPlayers > 4:
-            print('wrong number of players type again')
+            print('wrong number please type again')
             self.numberOfPlayers = int(input())
 
+
+    def setNumberOfBots(self):
+        print('type number of bots from 0 to 4')
+        self.numberOfBots = int(input())
+        while self.numberOfBots < 0 or self.numberOfBots > 4:
+            print('wrong number please type again')
+            self.numberOfBots = int(input())
+
         
-        for i in range(self.numberOfPlayers):
-            self.players[i].bot = False
+       
        
     #sets a new pawn on the starting point of the playing player and returns True
     # if it is not possible returns False
@@ -394,9 +399,21 @@ class Game:
               return checkingYard(locationOfPawns.sizeBoard - locationOfPawns.sizeOfYard + 2, 0 + 2, locationOfPawns)
         
         
+    #decisions made if a player is a bot 
+    def actingBot(self):
+        def movingPawn():
+            for pawn in self.players[self.turn - 1].pawns:
+                   if pawn.move(self.rolledNumber, self.boardPawns) == True:
+                       break
 
-        
-        
+        if self.players[self.turn - 1].bot ==True:
+            print('bot is playing')
+            if self.rollingDice() == 6:
+                if self.newPawn(self.boardPawns) == False:
+                    movingPawn()
+               
+                    
+
     def isOver(self):
         for player in self.players:
             assert isinstance(player, Player), 'it is not a player'
@@ -418,7 +435,7 @@ class Game:
         print('What pawn do you want to move?')
         namePawn = input()
 
-        for pawn in self.players[self.turn - 1]:
+        for pawn in self.players[self.turn - 1].pawns:
             if pawn.name == namePawn:
                 p = pawn
             else:
@@ -439,20 +456,28 @@ class Game:
 
     #switch to the next Player
     def switchPlayer(self):
-        self.turn = (self.turn + 1) % (self.numberOfPlayers) + 1
+        
+        self.turn += 1
+        if self.turn > self.numberOfPlayers:
+            self.turn = 1
 
+    def  getRolledNumber(self):
+             return self.rolledNumber
+        #rolling a dice
     def rollingDice(self):
+        print('Rolling a dice ...')
+        self.rolledNumber = random.randint(1, 6)
+        print('Number rolled is:', self.rolledNumber)
+
+    def rollingDiceProcess(self):
         actionCorrect = False
         #print message of options you have when you roll 6
         def printOptionsMessage():
-            print('type NEW if you want a new pawn and or type MOVE if you want to move a pawn') #TODO
+            print('type NEW if you want a new pawn and or type MOVE if you want to move a pawn')
        
-        #rolling a dice
-        print('Rolling a dice ...')
-        numberRolled = random.randint(1, 6)
-        print('Number rolled is:', numberRolled)
+        self.rollingDice()
 
-        if numberRolled == 6:   #if 6 is rolled
+        if self.rolledNumber == 6:   #if 6 is rolled
             printOptionsMessage() 
             choice = input()    #choice of a player
             while choice != 'NEW' and choice != 'MOVE'and actionCorrect == False: #testing validity
@@ -466,10 +491,15 @@ class Game:
                 else:
                     print('I cannot give you a new pawn')
             if choice == 'MOVE':
-                if self.movingPawn(numberRolled) == True:
+                if self.movingPawn(self.rolledNumber) == True:
                     actionCorrect == True
                 else:
                     print('I cannot move the pawn')
+        else:
+            if self.movingPawn(self.rolledNumber) == True:
+                actionCorrect == True
+            else:
+                print('I cannot move the pawn')         
 
 
     def printPlayer(self):
@@ -493,7 +523,7 @@ class Game:
             s1 = []
             s2 = []
             s3 = []
-            s4 = []
+            
             for col in range(colorfulBoard.sizeBoard):
                 colorOfBoard = colors[colorfulBoard.board[row][col]] #coloring board
                 grid = self.boardPawns.board[row][col]
@@ -513,18 +543,13 @@ class Game:
                 s2.append(stringForPawn)
                 s2.append(boardLR)
                
-                s3.append(boardLR) 
-                s3.append('  ')
-                s3.append(boardLR)
-
-                s4.append("")
-                s4.append(boardUD)
-                s4.append("")
+                s3.append("")
+                s3.append(boardUD)
+                s3.append("")
 
             print(*s1)
             print(*s2)
             print(*s3)
-            print(*s4)
 
 
 
@@ -532,58 +557,41 @@ class Game:
         print(colors[0])
 
 
-    def play(self):
-        board = Board()
-        while(self.isOver() == False):
-            board.show()
+def play():
+    game = Game()
 
-            self.rollingDice()
+    #setting the game
+    
+    game.setNumberOfPlayers()
+    game.setNumberOfBots()
+    game.settingPawns(game.boardPawns)
+    game.displayingGameBoard()
 
-
-# while(True):
-#     game.rollingDice()
-
-test = Board()
-# test.createBoard()
-# p = Pawn(0, 9, 1, 'G' + '1')
-# p.move(3, test)
-# a = p = Pawn(0, 9, 2, 'G' + '2')
-# a.move(3, test)
-
-# a = p = Pawn(0, 9, 1, 'A' + '2')
-# a.move(3, test)
-game = Game()
+    agreeingToContinue = ''   #if the game should continue
 
 
 
 
+    while(game.isOver() == False and agreeingToContinue != 'NO'):
+        game.printPlayer()
 
-game.settingPawns(game.boardPawns)
-# game.newPawn(test)
-
-
-# game.players[3].pawns[0].move(64, test)
-# game.newPawn(test)
-# game.players[3].pawns[1].move(65, test)
-# game.newPawn(test)
-# game.players[3].pawns[2].move(66, test)
-# game.newPawn(test)
-# game.players[3].pawns[3].move(67, test)
-# test.printingBoard()
-# print(game.players[3].isWinner())
-# print(game.players[2].isWinner())
-# print(game.isOver())
+        if game.players[game.turn - 1].bot == True:
+            game.actingBot()
+        else:
+             game.rollingDiceProcess()    
+       
+        game.displayingGameBoard()
+        game.switchPlayer()
 
 
-game.displayingGameBoard()
+        print('Do you want to continue? if you want to quit type NO')
+        agreeingToContinue = input()
+    
+    
+    print('Game is over')
 
 
-
-# game.players[1].pawns[1].move(62, test)
-# test.printingBoard()
-# game.players[1].pawns[1].move(7, test)
-# test.printingBoard()
-
+play()
 
 
 
