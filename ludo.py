@@ -93,18 +93,19 @@ class Pawn(): #TODO
                     turnRight()
                     self.goingToHouse = True
 
-        if self.player == 2:
-            if self.positionRow == 0 and self.positionColumn == locationOfPawns.sizeOfYard + 1:
-                turnDown()
-                self.goingToHouse = True
-        if self.player == 3:
-            if self.positionRow == locationOfPawns.sizeOfYard + 1 and self.positionColumn == locationOfPawns.sizeBoard - 1:
-                turnLeft()
-                self.goingToHouse = True
-        if self.player == 4:
-            if self.positionRow == locationOfPawns.sizeBoard - 1 and self.positionColumn == locationOfPawns.sizeOfYard + 1:
-                turnUp()
-                self.goingToHouse = True
+            if self.player == 2:
+                if self.positionRow == 0 and self.positionColumn == locationOfPawns.sizeOfYard + 1:
+                    turnDown()
+                    self.goingToHouse = True
+
+            if self.player == 3:
+                if self.positionRow == locationOfPawns.sizeOfYard + 1 and self.positionColumn == locationOfPawns.sizeBoard - 1:
+                    turnLeft()
+                    self.goingToHouse = True
+            if self.player == 4:
+                if self.positionRow == locationOfPawns.sizeBoard - 1 and self.positionColumn == locationOfPawns.sizeOfYard + 1:
+                    turnUp()
+                    self.goingToHouse = True
                 
         
 
@@ -134,15 +135,14 @@ class Pawn(): #TODO
            go()
            if self.goingToHouse == True:
                    movesToHouse += 1
+                   if movesToHouse + self.gridInHouse > locationOfPawns.sizeOfHouse:
+                    self.positionRow = previousPositionRow
+                    self.positionColumn = previousPositionColumn
+                    locationOfPawns.board[self.positionRow][self.positionColumn] = self
+                    return False #it is not possible to move to house
 
 
         if self.goingToHouse == True:
-            if movesToHouse + self.gridInHouse > locationOfPawns.sizeOfHouse:
-                self.positionRow = previousPositionRow
-                self.positionColumn = previousPositionColumn
-                locationOfPawns.board[self.positionRow][self.positionColumn] = self
-                return False #it is not possible to move to house
-            else:
                 self.gridInHouse += movesToHouse
                 
                 
@@ -328,7 +328,7 @@ class Player:
 class Game:
     def __init__(self):
         self.boardPawns = Board()
-        self.turn = 2
+        self.turn = 4
         self.numberOfPlayers = 1
         self.players = []
         
@@ -396,7 +396,7 @@ class Game:
 
         
         
-    def isEnd(self):
+    def isOver(self):
         for player in self.players:
             assert isinstance(player, Player), 'it is not a player'
             if player.isWinner():
@@ -438,8 +438,7 @@ class Game:
 
     def printPlayer(self):   #TODO
         pass
-    def isOver(self): #TODO
-        pass
+    
 
     def play(self):
         board = Board()
@@ -464,17 +463,26 @@ test = Board()
 game = Game()
 
 
+
+
+
 game.settingPawns(test)
 game.newPawn(test)
-test.createBoard()
 
 
-
-game.players[1].pawns[0].move(65, test)
-test.printingBoard()
+game.players[3].pawns[0].move(64, test)
 game.newPawn(test)
-game.players[1].pawns[0].move(1, test)
+game.players[3].pawns[1].move(65, test)
+game.newPawn(test)
+game.players[3].pawns[2].move(66, test)
+game.newPawn(test)
+game.players[3].pawns[3].move(67, test)
 test.printingBoard()
+print(game.players[3].isWinner())
+print(game.players[2].isWinner())
+print(game.isOver())
+
+
 
 # game.players[1].pawns[1].move(62, test)
 # test.printingBoard()
