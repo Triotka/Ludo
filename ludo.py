@@ -15,9 +15,15 @@ class Pawn(): #TODO
         self.name = name    #name visible on the board
         self.directionColumn = 0    #direction for next move for the column
         self.directionRow = 0   #direction for next move for the row
+        self.goingToHouse = False
+        self.gridInHouse = 0 #on which grid in the house it is
 
      #moving the pawn by number of moves on the board   
     def move(self, numberOfMoves, locationOfPawns):
+        #position of a pawn before moving
+        previousPositionRow = self.positionRow
+        previousPositionColumn =  self.positionColumn
+        movesToHouse = 0
         
         #moves pawn one grid in proper direction and returns a board with this change
         def go():
@@ -80,26 +86,66 @@ class Pawn(): #TODO
                     turnRight()
                 elif self.positionRow == locationOfPawns.sizeOfYard + 2:  #bottom one
                     turnDown()
-        
-        #position of a pawn before moving
-        previousPositionRow = self.positionRow
-        previousPositionColumn =  self.positionColumn
 
+            #position of entering to house
+            if self.player == 1:
+                if self.positionRow == locationOfPawns.sizeOfYard + 1 and self.positionColumn == 0:
+                    turnRight()
+                    self.goingToHouse = True
+
+        if self.player == 2:
+            if self.positionRow == 0 and self.positionColumn == locationOfPawns.sizeOfYard + 1:
+                turnDown()
+                self.goingToHouse = True
+        if self.player == 3:
+            if self.positionRow == locationOfPawns.sizeOfYard + 1 and self.positionColumn == locationOfPawns.sizeBoard - 1:
+                turnLeft()
+                self.goingToHouse = True
+        if self.player == 4:
+            if self.positionRow == locationOfPawns.sizeBoard - 1 and self.positionColumn == locationOfPawns.sizeOfYard + 1:
+                turnUp()
+                self.goingToHouse = True
+                
+        
+
+        
+        locationOfPawns.board[previousPositionRow][previousPositionColumn] = 0
         for i in range(numberOfMoves):
+           
            turning()
+           
+           
            #checking if there is a pawn from someone else if so kill it
            if i == numberOfMoves - 1:
                grid = locationOfPawns.board[self.positionRow + self.directionRow][self.positionColumn + self.directionColumn]
-               if grid != 0:
+               if isinstance(grid, Pawn):
                     if grid.player == self.player:   #if pawn on the grid is from the same player they are going to be after each other
-                        break
+                        if self.goingToHouse == False:
+                            break
+                        else:
+                            self.positionRow = previousPositionRow
+                            self.positionColumn = previousPositionColumn
+                            locationOfPawns.board[self.positionRow][self.positionColumn] = self
+                            return False #it is not possible to move to house
                     else:
                         grid.returnToYard(locationOfPawns)
-           go()
 
-        #setting previous position to 0 if a pawn moved
-        if previousPositionRow != self.positionRow and previousPositionColumn != self.positionColumn:
-            locationOfPawns.board[previousPositionRow][previousPositionColumn] = 0
+
+           go()
+           if self.goingToHouse == True:
+                   movesToHouse += 1
+
+
+        if self.goingToHouse == True:
+            if movesToHouse + self.gridInHouse > locationOfPawns.sizeOfHouse:
+                self.positionRow = previousPositionRow
+                self.positionColumn = previousPositionColumn
+                locationOfPawns.board[self.positionRow][self.positionColumn] = self
+                return False #it is not possible to move to house
+            else:
+                self.gridInHouse += movesToHouse
+                
+                
         
         #setting a pawn to a certain location
         locationOfPawns.board[self.positionRow][self.positionColumn] = self
@@ -130,8 +176,7 @@ class Pawn(): #TODO
             nextPositionRow = locationOfPawns.sizeBoard - 1
             nextPositionColumn = locationOfPawns.sizeOfYard
 
-            
-            
+                       
         if  locationOfPawns.board[nextPositionRow][nextPositionColumn] == 0: #if start is empty
             locationOfPawns.board[self.positionRow][self.positionColumn] = 0
             self.positionRow = nextPositionRow
@@ -253,7 +298,6 @@ class Board:
 
 class Player:
     def __init__(self, number, identificator, bot):
-        self.PawnsInHouse = 0
         self.pawns = []
         self.identificator = identificator
         self.number = number
@@ -269,15 +313,22 @@ class Player:
                 self.pawns.append(pawn)
                 locationOfPawns.board[yardRow + i][yardColumn + j] = pawn #putting it on the board with pawns
     
+    def isWinner(self):
+        for pawn in self.pawns:
+            if pawn.gridInHouse == 0:
+                return False
+        return True
+
     #decisions made if a player is a bot 
-    def actingBot(self):
+    def actingBot(self): #TODO
         assert self.bot == True, 'player is not a bot'
 
-                
+
+    
 class Game:
     def __init__(self):
         self.boardPawns = Board()
-        self.turn = 1
+        self.turn = 2
         self.numberOfPlayers = 1
         self.players = []
         
@@ -345,7 +396,13 @@ class Game:
 
         
         
-      
+    def isEnd(self):
+        for player in self.players:
+            assert isinstance(player, Player), 'it is not a player'
+            if player.isWinner():
+                return True
+        return False
+
     def movingPawn(self): #TODO
         print('moving pawn')
 
@@ -405,23 +462,25 @@ test = Board()
 # a = p = Pawn(0, 9, 1, 'A' + '2')
 # a.move(3, test)
 game = Game()
+
+
 game.settingPawns(test)
-print(game.newPawn(test))
-
-print(game.newPawn(test))
-
+game.newPawn(test)
+test.createBoard()
 
 
 
-
-
+game.players[1].pawns[0].move(65, test)
+test.printingBoard()
+game.newPawn(test)
+game.players[1].pawns[0].move(1, test)
 test.printingBoard()
 
+# game.players[1].pawns[1].move(62, test)
+# test.printingBoard()
+# game.players[1].pawns[1].move(7, test)
+# test.printingBoard()
 
-
-# for i in range(20):
-#     p.move(5, test)
-#     test.printingBoard()
 
 
 
