@@ -514,7 +514,7 @@ class Game:
                 s2.append(boardLR)
                
                 s3.append(boardLR) 
-                s3.append(stringForPawn)
+                s3.append('  ')
                 s3.append(boardLR)
 
                 s4.append("")
@@ -558,27 +558,22 @@ game = Game()
 
 
 
-game.settingPawns(test)
-game.newPawn(test)
+game.settingPawns(game.boardPawns)
+# game.newPawn(test)
 
 
-game.players[3].pawns[0].move(64, test)
-game.newPawn(test)
-game.players[3].pawns[1].move(65, test)
-game.newPawn(test)
-game.players[3].pawns[2].move(66, test)
-game.newPawn(test)
-game.players[3].pawns[3].move(67, test)
-test.printingBoard()
-print(game.players[3].isWinner())
-print(game.players[2].isWinner())
-print(game.isOver())
+# game.players[3].pawns[0].move(64, test)
+# game.newPawn(test)
+# game.players[3].pawns[1].move(65, test)
+# game.newPawn(test)
+# game.players[3].pawns[2].move(66, test)
+# game.newPawn(test)
+# game.players[3].pawns[3].move(67, test)
+# test.printingBoard()
+# print(game.players[3].isWinner())
+# print(game.players[2].isWinner())
+# print(game.isOver())
 
-print("\033[1;32;40m Bright Green  \n")
-print("\033[1;33;40m Bright yellow  \n")
-print("\033[1;31;40m Bright red  \n")
-print("\033[1;34;40m Bright blue  \n")
-print("\033[1;37;40m Bright White ","\033[1;34;40m Bright blue  \n" )
 
 game.displayingGameBoard()
 
