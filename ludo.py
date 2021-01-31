@@ -5,6 +5,7 @@ import random
 
 
 
+
     
 class Pawn(): #TODO
     def __init__(self, positionRow, positionColumn, player, name):
@@ -403,7 +404,34 @@ class Game:
                 return True
         return False
 
-    def movingPawn(self): #TODO
+    
+    #it sets a new pawn to a player and returns True if possible False if not, it has messages for a player
+    def givingNewPawn(self): #TODO
+        if self.newPawn(self.boardPawns) == False:
+            return False
+        else:
+            print('new pawn is ready')
+            return True
+
+    #moves a certain pawn a number of moves return True if possible and False if not it also has messages for a player
+    def movingPawn(self, numberOfMoves): #TODO
+        print('What pawn do you want to move?')
+        namePawn = input()
+
+        for pawn in self.players[self.turn - 1]:
+            if pawn.name == namePawn:
+                p = pawn
+            else:
+                print('pawn not found')
+                return False
+
+        
+        
+        if p.move(numberOfMoves, self.boardPawns) == False:
+            return False
+        else:
+            print('pawn moved')
+            return True
         print('moving pawn')
 
 
@@ -414,9 +442,10 @@ class Game:
         self.turn = (self.turn + 1) % (self.numberOfPlayers) + 1
 
     def rollingDice(self):
+        actionCorrect = False
         #print message of options you have when you roll 6
         def printOptionsMessage():
-            print('TODO message for choice') #TODO
+            print('type NEW if you want a new pawn and or type MOVE if you want to move a pawn') #TODO
        
         #rolling a dice
         print('Rolling a dice ...')
@@ -426,19 +455,82 @@ class Game:
         if numberRolled == 6:   #if 6 is rolled
             printOptionsMessage() 
             choice = input()    #choice of a player
-            while choice != 'new' and choice != 'move': #testing validity
+            while choice != 'NEW' and choice != 'MOVE'and actionCorrect == False: #testing validity
                 print('Invalid option type it again')
                 printOptionsMessage()
                 choice = input()
             
-            if choice == 'new':
-                self.newPawn()   #TODO
-            if choice == 'move':
-                self.movingPawn()    #TODO
+            if choice == 'NEW':
+                if self.givingNewPawn() == True:  
+                    actionCorrect = True
+                else:
+                    print('I cannot give you a new pawn')
+            if choice == 'MOVE':
+                if self.movingPawn(numberRolled) == True:
+                    actionCorrect == True
+                else:
+                    print('I cannot move the pawn')
 
-    def printPlayer(self):   #TODO
-        pass
+
+    def printPlayer(self):
+        print('it is turn of player', self.turn )
     
+
+    def displayingGameBoard(self):
+        #colors used
+        # green = "\033[1;32;40m"
+        # yellow = "\033[1;33;40m"
+        # red = "\033[1;31;40m"
+        # blue = "\033[1;34;40m"
+        # white = "\033[1;37;40m"
+
+        colors = ["\033[1;37;40m", "\033[1;32;40m", "\033[1;31;40m", "\033[1;34;40m", "\033[1;33;40m"]
+
+        colorfulBoard = Board()
+        colorfulBoard.createBoard()
+
+        for row in range (colorfulBoard.sizeBoard):
+            s1 = []
+            s2 = []
+            s3 = []
+            s4 = []
+            for col in range(colorfulBoard.sizeBoard):
+                colorOfBoard = colors[colorfulBoard.board[row][col]] #coloring board
+                grid = self.boardPawns.board[row][col]
+
+                boardLR = colorOfBoard + ' |' #colorful string for making left and right sides of a grid
+                boardUD = colorOfBoard + ' -----' #colorful string for making top and botom sides of a grid
+                if isinstance(grid, Pawn):
+                    colorOfPawn = colors[grid.player] #coloring pawns
+                    stringForPawn = colorOfPawn + grid.name
+                else:
+                     stringForPawn = '  '
+                s1.append("")
+                s1.append(boardUD,)
+                s1.append("")
+
+                s2.append(boardLR) 
+                s2.append(stringForPawn)
+                s2.append(boardLR)
+               
+                s3.append(boardLR) 
+                s3.append(stringForPawn)
+                s3.append(boardLR)
+
+                s4.append("")
+                s4.append(boardUD)
+                s4.append("")
+
+            print(*s1)
+            print(*s2)
+            print(*s3)
+            print(*s4)
+
+
+
+       #put colors to white for writing
+        print(colors[0])
+
 
     def play(self):
         board = Board()
@@ -481,6 +573,14 @@ test.printingBoard()
 print(game.players[3].isWinner())
 print(game.players[2].isWinner())
 print(game.isOver())
+
+print("\033[1;32;40m Bright Green  \n")
+print("\033[1;33;40m Bright yellow  \n")
+print("\033[1;31;40m Bright red  \n")
+print("\033[1;34;40m Bright blue  \n")
+print("\033[1;37;40m Bright White ","\033[1;34;40m Bright blue  \n" )
+
+game.displayingGameBoard()
 
 
 
